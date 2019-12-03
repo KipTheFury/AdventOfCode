@@ -1,5 +1,8 @@
 package day1;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -60,6 +63,8 @@ import java.io.IOException;
  */
 public class Day1 {
 
+    private static final Logger log = LoggerFactory.getLogger("Day 1");
+
     public static void main(String[] args) {
 
         File inputFile = new File("src/main/resources/day1-mass-input");
@@ -79,10 +84,10 @@ public class Day1 {
                 totalFuelWithAdditional += calculator.calculateFuelWithAdditionalFuel(mass);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
-        System.out.println("Total fuel - " + totalFuel);
-        System.out.println("Total fuel with additional - " + totalFuelWithAdditional);
+        log.info("Part 1 : Total fuel [{}]", totalFuel);
+        log.info("Part 2 : Total fuel with additional fuel weight [{}]", totalFuelWithAdditional);
     }
 }

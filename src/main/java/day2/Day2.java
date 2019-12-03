@@ -1,5 +1,8 @@
 package day2;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * --- Day 2: 1202 Program Alarm ---
  * On the way to your gravity assist around the Moon, your ship computer beeps angrily about a "1202 program alarm".
@@ -106,7 +109,8 @@ package day2;
  */
 public class Day2 {
 
-    final static IntcodeParser parser = new IntcodeParser();
+    private static final Logger log = LoggerFactory.getLogger("Day 2");
+    private static final IntcodeParser parser = new IntcodeParser();
 
     public static void main(String[] args) {
 
@@ -122,7 +126,7 @@ public class Day2 {
         input[2] = 2;
 
         int[] result = parser.parseIntcode(input);
-        System.out.println("Part 1 - " + result[0]);
+        log.info("Part 1 : Intcode result [{}]", result[0]);
     }
 
     private static void partTwo() {
@@ -136,12 +140,11 @@ public class Day2 {
                 intcode[2] = verb;
 
                 int[] result = parser.parseIntcode(intcode);
-
                 if (result[0] == 19690720) {
 
                     int answer = 100 * noun + verb;
 
-                    System.out.println("Part 2 - [" + answer + "] noun = [" + noun + "] verb = [" + verb + "]");
+                    log.info("Part 2:  noun = [{}] verb = [{}] answer = [{}]", noun, verb, answer);
                 }
             }
         }
