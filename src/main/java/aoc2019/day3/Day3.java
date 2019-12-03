@@ -2,13 +2,8 @@ package aoc2019.day3;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.FileUtils;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -89,14 +84,7 @@ public class Day3 {
 
     public static void main(String[] args) {
 
-        List<String> linesList = Collections.emptyList();
-        try {
-            linesList = Files.readAllLines(Paths.get("src/main/resources/2019/day3-wires"), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String[] wires = linesList.toArray(new String[linesList.size()]);
+        String[] wires = FileUtils.getLinesAsArray("src/main/resources/2019/day3-wires");
         WireIntersector intersector = new WireIntersector();
 
         log.debug("Building Paths");
