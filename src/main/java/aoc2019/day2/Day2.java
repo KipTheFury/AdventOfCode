@@ -1,4 +1,4 @@
-package day2;
+package aoc2019.day2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

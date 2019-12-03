@@ -1,4 +1,4 @@
-package day1;
+package aoc2019.day1;
 
 public class FuelCalculator {
 

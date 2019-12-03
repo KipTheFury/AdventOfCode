@@ -1,4 +1,4 @@
-package day1;
+package aoc2019.day1;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

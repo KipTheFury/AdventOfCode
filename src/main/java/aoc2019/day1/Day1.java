@@ -1,4 +1,4 @@
-package day1;
+package aoc2019.day1;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class Day1 {
 
     public static void main(String[] args) {
 
-        File inputFile = new File("src/main/resources/day1-mass-input");
+        File inputFile = new File("src/main/resources/2019/day1-mass");
         FuelCalculator calculator = new FuelCalculator();
 
         int totalFuel = 0;

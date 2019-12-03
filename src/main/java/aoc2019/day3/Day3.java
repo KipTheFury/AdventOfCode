@@ -1,4 +1,4 @@
-package day3;
+package aoc2019.day3;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +91,7 @@ public class Day3 {
 
         List<String> linesList = Collections.emptyList();
         try {
-            linesList = Files.readAllLines(Paths.get("src/main/resources/day3-wires-input"), StandardCharsets.UTF_8);
+            linesList = Files.readAllLines(Paths.get("src/main/resources/2019/day3-wires"), StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
         }
