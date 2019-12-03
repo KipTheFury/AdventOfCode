@@ -1,7 +1,7 @@
 package aoc2018.day1;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FrequencyCalibrator {
 
@@ -19,16 +19,15 @@ public class FrequencyCalibrator {
     public int findRepeatedFrequency(String[] instructions) {
 
         int repeatedFrequency = 0;
-        List<Integer> repeatedFrequencies = new ArrayList<>();
+        Set<Integer> repeatedFrequencies = new HashSet<>();
         int frequency = 0;
 
         while (repeatedFrequency == 0) {
 
             for (String instruction : instructions) {
                 frequency = parseInstruction(frequency, instruction);
-                if (!repeatedFrequencies.contains(frequency)) {
-                    repeatedFrequencies.add(frequency);
-                } else {
+
+                if (!repeatedFrequencies.add(frequency)) {
                     repeatedFrequency = frequency;
                     break;
                 }
