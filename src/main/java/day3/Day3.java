@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * --- Day 3: Crossed Wires ---
@@ -100,12 +101,11 @@ public class Day3 {
 
         log.debug("Building Paths");
         long startTime = System.currentTimeMillis();
-        List<WireIntersector.Coords> firstPath = intersector.getPath(wires[0]);
-        List<WireIntersector.Coords> secondPath = intersector.getPath(wires[1]);
-        List<WireIntersector.Coords> intersections = intersector.getIntersections(firstPath, secondPath);
+        Map<WireIntersector.Coords, Integer> intersections = intersector.calculateIntersections(wires[0].split(","),
+                wires[1].split(","));
         log.debug("Paths built in {} ms", ((System.currentTimeMillis() - startTime)));
 
         log.info("Part 1 : Closest Intersection [{}]", intersector.getClosestIntersection(intersections));
-        log.info("Part 2 : Fewest Steps [{}]", intersector.getFewestSteps(firstPath, secondPath, intersections));
+        log.info("Part 2 : Fewest Steps [{}]", intersector.getFewestSteps(intersections));
     }
 }

@@ -1,43 +1,19 @@
 package day3;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class WireIntersector {
 
-    public int getClosestIntersection(List<Coords> intersections) {
+    public int getClosestIntersection(Map<Coords, Integer> intersections) {
 
-        ArrayList<Integer> distances = new ArrayList<>();
-
-        for (Coords c : intersections) {
-            distances.add(calculateManhattanDistance(c));
-        }
-
-        return Collections.min(distances);
+        return intersections.entrySet().stream().map(Map.Entry::getKey).mapToInt(this::calculateManhattanDistance).min().getAsInt();
     }
 
-    public int getFewestSteps(List<Coords> firstPath, List<Coords> secondPath, List<Coords> intersections) {
+    public int getFewestSteps(Map<Coords, Integer> intersections) {
 
-        ArrayList<Integer> steps = new ArrayList<>();
-
-        for (Coords intersection : intersections) {
-            steps.add((firstPath.indexOf(intersection) + 1) + (secondPath.indexOf(intersection) + 1));
-        }
-
-        return Collections.min(steps);
-    }
-
-    public List<Coords> getIntersections(List<Coords> first, List<Coords> second) {
-        List<Coords> intersections = new ArrayList<>(first);
-        intersections.retainAll(second);
-        return intersections;
-    }
-
-    public List<Coords> getPath(String first) {
-        String[] firstWireDirections = first.split(",");
-        return calculatePath(firstWireDirections);
+        return intersections.entrySet().stream().mapToInt(Map.Entry::getValue).min().getAsInt();
     }
 
     private int calculateManhattanDistance(Coords c) {
@@ -45,42 +21,39 @@ public class WireIntersector {
         return Math.abs(c.x - 0) + Math.abs(c.y - 0);
     }
 
-    private List<Coords> calculatePath(String[] directions) {
+    public Map<Coords, Integer> calculateIntersections(String[] wire1, String[] wire2) {
 
-        int x = 0;
-        int y = 0;
+        Map<Coords, Integer> intersections = new HashMap<>();
 
-        List<Coords> path = new ArrayList<>();
+        Map<Coords, Integer> firstPath = getPath(wire1);
+        Map<Coords, Integer> secondPath = getPath(wire2);
 
-        for (String d : directions) {
+        for (Map.Entry<Coords, Integer> entry : firstPath.entrySet()) {
 
-            char direction = d.charAt(0);
-            int distance = Integer.parseInt(d.substring(1));
+            Coords key = entry.getKey();
 
-            switch (direction) {
-                case 'U':
-                    for (int i = 0; i < distance; i++) {
-                        path.add(new Coords(x, y++));
-                    }
-                    break;
-                case 'D':
-                    for (int i = 0; i < distance; i++) {
-                        path.add(new Coords(x, y--));
-                    }
-                    break;
-                case 'R':
-                    for (int i = 0; i < distance; i++) {
-                        path.add(new Coords(x++, y));
-                    }
-                    break;
-                case 'L':
-                    for (int i = 0; i < distance; i++) {
-                        path.add(new Coords(x--, y));
-                    }
-                    break;
+            if (secondPath.containsKey(key)) {
+                intersections.putIfAbsent(key, entry.getValue() + secondPath.get(key));
             }
         }
 
+        return intersections;
+    }
+
+    private Map<Coords, Integer> getPath(String[] wire1) {
+
+        Map<Coords, Integer> path = new HashMap<>();
+        Coords first = new Coords(0, 0);
+
+        int steps = 0;
+
+        for (String d : wire1) {
+            char direction = d.charAt(0);
+            int distance = Integer.parseInt(d.substring(1));
+            for (int i = 0; i < distance; i++) {
+                path.putIfAbsent(first.move(direction), ++steps);
+            }
+        }
         return path;
     }
 
@@ -92,6 +65,21 @@ public class WireIntersector {
         public Coords(int x, int y) {
             this.x = x;
             this.y = y;
+        }
+
+        public Coords move(char direction) {
+            switch (direction) {
+                case 'U':
+                    return new Coords(x, y += 1);
+                case 'D':
+                    return new Coords(x, y -= 1);
+                case 'R':
+                    return new Coords(x += 1, y);
+                case 'L':
+                    return new Coords(x -= 1, y);
+                default:
+                    return this;
+            }
         }
 
         @Override
