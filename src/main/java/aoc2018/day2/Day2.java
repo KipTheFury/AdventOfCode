@@ -2,6 +2,7 @@ package aoc2018.day2;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.FileUtils;
 
 /**
  * --- Day 2: Inventory Management System ---
@@ -39,12 +40,37 @@ import org.slf4j.LoggerFactory;
  * which appears exactly three times. Multiplying these together produces a checksum of 4 * 3 = 12.
  * <p>
  * What is the checksum for your list of box IDs?
+ *
+ * --- Part Two ---
+ * Confident that your list of box IDs is complete, you're ready to find the boxes full of prototype fabric.
+ *
+ * The boxes will have IDs which differ by exactly one character at the same position in both strings. For example,
+ * given the following box IDs:
+ *
+ * abcde
+ * fghij
+ * klmno
+ * pqrst
+ * fguij
+ * axcye
+ * wvxyz
+ * The IDs abcde and axcye are close, but they differ by two characters (the second and fourth). However, the IDs
+ * fghij and fguij differ by exactly one character, the third (h and u). Those must be the correct boxes.
+ *
+ * What letters are common between the two correct box IDs? (In the example above, this is found by removing the
+ * differing character from either ID, producing fgij.)
  */
 public class Day2 {
 
-    private Logger log = LoggerFactory.getLogger("2018 Day2");
+    private static final Logger log = LoggerFactory.getLogger("2018 Day2");
 
     public static void main(String[] args) {
 
+        String[] ids = FileUtils.getLinesAsArray("src/main/resources/2018/day2-ids");
+
+        IdChecksumGenerator generator = new IdChecksumGenerator();
+
+        log.info("Part 1 : Checksum [{}]", generator.getChecksum(ids));
+        log.info("Part 2 : Common Letters [{}]", generator.findCommonLettersInAdjacentIds(ids));
     }
 }
