@@ -2,11 +2,7 @@ package aoc2019.day1;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import utils.FileUtils;
 
 /**
  * --- Day 1: The Tyranny of the Rocket Equation ---
@@ -67,24 +63,17 @@ public class Day1 {
 
     public static void main(String[] args) {
 
-        File inputFile = new File("src/main/resources/2019/day1-mass");
+        String[] lines = FileUtils.getLinesAsArray("src/main/resources/2019/day1-mass");
         FuelCalculator calculator = new FuelCalculator();
 
         int totalFuel = 0;
         int totalFuelWithAdditional = 0;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
+        for (String line : lines) {
 
-            String line;
-            while ((line = br.readLine()) != null) {
-
-                int mass = Integer.parseInt(line);
-
-                totalFuel += calculator.calculateFuel(mass);
-                totalFuelWithAdditional += calculator.calculateFuelWithAdditionalFuel(mass);
-            }
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            int mass = Integer.parseInt(line);
+            totalFuel += calculator.calculateFuel(mass);
+            totalFuelWithAdditional += calculator.calculateFuelWithAdditionalFuel(mass);
         }
 
         log.info("Part 1 : Total fuel [{}]", totalFuel);
