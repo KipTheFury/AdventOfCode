@@ -1,7 +1,11 @@
 package aoc2019.day2;
 
+import common.IntcodeParser;
+import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * --- Day 2: 1202 Program Alarm ---
@@ -120,13 +124,13 @@ public class Day2 {
 
     private static void partOne() {
 
-        int[] input = getInitialInput();
+        int[] intcode = getInitialIntcode();
 
-        input[1] = 12;
-        input[2] = 2;
+        intcode[1] = 12;
+        intcode[2] = 2;
 
-        int[] result = parser.parseIntcode(input);
-        log.info("Part 1 : Intcode result [{}]", result[0]);
+        Pair<int[], List<Integer>> result = parser.parseIntcode(intcode, 0);
+        log.info("Part 1 : Intcode result [{}]", result.getValue0()[0]);
     }
 
     private static void partTwo() {
@@ -134,13 +138,13 @@ public class Day2 {
         for (int noun = 0; noun <= 99; noun++) {
             for (int verb = 0; verb <= 99; verb++) {
 
-                int[] intcode = getInitialInput();
+                int[] intcode = getInitialIntcode();
 
                 intcode[1] = noun;
                 intcode[2] = verb;
 
-                int[] result = parser.parseIntcode(intcode);
-                if (result[0] == 19690720) {
+                Pair<int[], List<Integer>> result = parser.parseIntcode(intcode, 0);
+                if (result.getValue0()[0] == 19690720) {
 
                     int answer = 100 * noun + verb;
 
@@ -150,7 +154,7 @@ public class Day2 {
         }
     }
 
-    private static int[] getInitialInput() {
+    private static int[] getInitialIntcode() {
 
         return new int[]{1, 0, 0, 3, 1, 1, 2, 3, 1, 3, 4, 3, 1, 5, 0, 3, 2, 9, 1, 19, 1, 19, 5, 23, 1, 23, 6, 27, 2,
                 9, 27, 31, 1, 5, 31, 35, 1, 35, 10, 39, 1, 39, 10, 43, 2, 43, 9, 47, 1, 6, 47, 51, 2, 51, 6, 55, 1, 5
