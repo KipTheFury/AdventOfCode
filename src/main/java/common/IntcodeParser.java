@@ -17,6 +17,10 @@ public class IntcodeParser {
     private static final int MULTIPLY = 2;
     private static final int INPUT = 3;
     private static final int OUTPUT = 4;
+    private static final int JUMP_IF_TRUE = 5;
+    private static final int JUMP_IF_FALSE = 6;
+    private static final int LESS_THAN = 7;
+    private static final int EQUALS = 8;
     private static final int HALT = 99;
 
     private int pointer;
@@ -35,17 +39,39 @@ public class IntcodeParser {
             if (instruction > 100) {
                 subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 4);
                 parseParameterModes(intcode, subInstruction, input);
-            } else if (instruction == INPUT || instruction == OUTPUT) {
-                subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 2);
-                parseInOutInstruction(subInstruction, intcode, input);
-            } else if (instruction == ADD || instruction == MULTIPLY) {
-                subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 4);
-                subInstruction[1] = intcode[subInstruction[1]];
-                subInstruction[2] = intcode[subInstruction[2]];
-                parseAddMultiplyInstruction(subInstruction, intcode);
             } else {
-                log.error("Invalid OpCode [{}] at intcode[{}]", instruction, pointer);
-                break;
+
+                switch (instruction) {
+                    case INPUT:
+                    case OUTPUT:
+
+                        subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 2);
+                        parse2ParamInstruction(subInstruction, intcode, input);
+                        break;
+
+                    case JUMP_IF_FALSE:
+                    case JUMP_IF_TRUE:
+
+                        subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 3);
+                        parse3ParamInstruction(subInstruction, intcode);
+                        break;
+
+                    case ADD:
+                    case MULTIPLY:
+                    case LESS_THAN:
+                    case EQUALS:
+
+                        subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 4);
+                        subInstruction[1] = intcode[subInstruction[1]];
+                        subInstruction[2] = intcode[subInstruction[2]];
+                        parse4ParamInstruction(subInstruction, intcode);
+                        break;
+
+
+                    default:
+                        log.error("Invalid OpCode [{}] at intcode[{}]", instruction, pointer);
+                        break;
+                }
             }
         }
 
@@ -53,7 +79,7 @@ public class IntcodeParser {
         return retVal;
     }
 
-    private void parseAddMultiplyInstruction(int[] subInstruction, int[] intcode) {
+    private void parse4ParamInstruction(int[] subInstruction, int[] intcode) {
 
         int opcode = subInstruction[0];
         int param1 = subInstruction[1];
@@ -76,11 +102,54 @@ public class IntcodeParser {
 
                 intcode[writeTo] = param1 * param2;
                 break;
+
+            case LESS_THAN:
+
+                boolean lessThan = param1 < param2;
+                log.debug("Processing Instruction [{}] : [{}] < [{}] = [{}] : intcode[{}]", subInstruction, param1,
+                        param2, lessThan, writeTo);
+                intcode[writeTo] = lessThan ? 1 : 0;
+                break;
+
+            case EQUALS:
+
+                boolean equal = param1 == param2;
+                log.debug("Processing Instruction [{}] : [{}] == [{}] = [{}] : intcode[{}]", subInstruction, param1,
+                        param2, equal, writeTo);
+                intcode[writeTo] = equal ? 1 : 0;
+                break;
         }
         pointer += 4;
     }
 
-    private void parseInOutInstruction(int[] subInstruction, int[] intcode, int input) {
+    private void parse3ParamInstruction(int[] subInstruction, int[] intcode) {
+
+        int opcode = subInstruction[0];
+        int param1 = subInstruction[1];
+        int param2 = subInstruction[2];
+
+        switch (opcode) {
+            case JUMP_IF_TRUE:
+                if (param1 != 0) {
+                    log.debug("Processing Instruction [{}] : Pointer set to [{}]", subInstruction, param2);
+                    pointer = param2;
+                } else {
+                    pointer += 3;
+                }
+                break;
+
+            case JUMP_IF_FALSE:
+                if (param1 == 0) {
+                    log.debug("Processing Instruction [{}] : Pointer set to [{}]", subInstruction, param2);
+                    pointer = param2;
+                } else {
+                    pointer += 3;
+                }
+                break;
+        }
+    }
+
+    private void parse2ParamInstruction(int[] subInstruction, int[] intcode, int input) {
 
         int opcode = subInstruction[0];
         int param1 = subInstruction[1];
@@ -107,37 +176,55 @@ public class IntcodeParser {
         int[] parsedInstruction = parseParameterNode(instruction[0]);
         int opcode = parsedInstruction[0] + parsedInstruction[1] * 10;
 
-        if (opcode == ADD || opcode == MULTIPLY) {
+        if (opcode == ADD || opcode == MULTIPLY || opcode == LESS_THAN || opcode == EQUALS) {
 
-            int paramMode1 = 0;
-            int paramMode2 = 0;
+            Pair<Integer, Integer> params = parseParam2_3(parsedInstruction, intcode, instruction);
 
-            try {
-                paramMode1 = parsedInstruction[2];
-            } catch (ArrayIndexOutOfBoundsException aioobe) {
-                //do nothing - keep as 0
-            }
-
-            try {
-                paramMode2 = parsedInstruction[3];
-            } catch (ArrayIndexOutOfBoundsException aioobe) {
-                //do nothing - keep as 0
-            }
-
-            int param1 = paramMode1 == 0 ? intcode[instruction[1]] : instruction[1];
-            int param2 = paramMode2 == 0 ? intcode[instruction[2]] : instruction[2];
             int writeTo = instruction[3];
+            int[] subInstruction = new int[]{opcode, params.getValue0(), params.getValue1(), writeTo};
 
-            int[] addMultInstruction = new int[]{opcode, param1, param2, writeTo};
-            parseAddMultiplyInstruction(addMultInstruction, intcode);
+            parse4ParamInstruction(subInstruction, intcode);
+
+        } else if (opcode == JUMP_IF_TRUE || opcode == JUMP_IF_FALSE) {
+
+            Pair<Integer, Integer> params = parseParam2_3(parsedInstruction, intcode, instruction);
+
+            int[] subInstruction = new int[]{opcode, params.getValue0(), params.getValue1()};
+            parse3ParamInstruction(subInstruction, intcode);
 
         } else if (opcode == INPUT || opcode == OUTPUT) {
 
             int param1 = parsedInstruction[2] == 0 ? intcode[instruction[1]] : instruction[1];
 
-            int[] inOutInstruction = new int[]{opcode, param1};
-            parseInOutInstruction(inOutInstruction, intcode, input);
+            int[] subInstruction = new int[]{opcode, param1};
+            parse2ParamInstruction(subInstruction, intcode, input);
+
+        } else {
+            log.error("Invalid OpCode [{}] at intcode[{}]", opcode, pointer);
         }
+    }
+
+    private Pair<Integer, Integer> parseParam2_3(int[] parsedInstruction, int[] intcode, int[] instruction) {
+
+        int paramMode1 = 0;
+        int paramMode2 = 0;
+
+        try {
+            paramMode1 = parsedInstruction[2];
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            //do nothing - keep as 0
+        }
+
+        try {
+            paramMode2 = parsedInstruction[3];
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            //do nothing - keep as 0
+        }
+
+        int param1 = paramMode1 == 0 ? intcode[instruction[1]] : instruction[1];
+        int param2 = paramMode2 == 0 ? intcode[instruction[2]] : instruction[2];
+
+        return Pair.with(param1, param2);
     }
 
     private int[] parseParameterNode(int i) {
