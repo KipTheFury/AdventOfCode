@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import utils.FileUtils;
 
 /**
- * --- Day 8: Space Image Format ---
+ * --- Day 8: Space ImageLayers Format ---
  * The Elves' spirits are lifted when they realize you have an opportunity to reboot one of their Mars rovers, and so
  * they are curious if you would spend a brief sojourn on Mars. You land your ship near the rover.
  * <p>
@@ -14,7 +14,7 @@ import utils.FileUtils;
  * input) and sends it to you via the Digital Sending Network.
  * <p>
  * Unfortunately, images sent via the Digital Sending Network aren't encoded with any normal encoding; instead,
- * they're encoded in a special Space Image Format. None of the Elves seem to remember why this is the case. They
+ * they're encoded in a special Space ImageLayers Format. None of the Elves seem to remember why this is the case. They
  * send you the instructions to decode it.
  * <p>
  * Images are sent as a series of digits that each represent the color of a single pixel. The digits fill each row of
@@ -84,52 +84,13 @@ public class Day8 {
         SpaceImageFormatDecoder decoder = new SpaceImageFormatDecoder();
 
         int width = 25, height = 6;
+        int numberOfLayers = input.length() / (width * height);
 
-        SpaceImageFormatDecoder.Image image = decoder.decodeImage(input, height, width);
+        int[][][] image = decoder.decodeImage(input, numberOfLayers, height, width);
 
-        int partOneAnswer = getPartOneAnswer(image);
+        log.info("Part 1 - 1 digits * 2 digits [{}]", decoder.getImageChecksum(image, numberOfLayers, height, width));
 
-        log.info("Part 1 - 1 digits * 2 digits [{}]", partOneAnswer);
-
-    }
-
-    private static int getPartOneAnswer(SpaceImageFormatDecoder.Image image) {
-        int layerIndex = 0;
-        int lowest0Count = 999;
-        int lowest0Layer = 0;
-
-        for (SpaceImageFormatDecoder.Layer layer : image.layers.values()) {
-
-            int zeroCount = 0;
-
-            for (SpaceImageFormatDecoder.Row row : layer.rows.values()) {
-                for (char c : row.characters) {
-                    if (c == '0') zeroCount++;
-                }
-            }
-
-            if (zeroCount < lowest0Count) {
-                lowest0Count = zeroCount;
-                lowest0Layer = layerIndex;
-            }
-
-            layerIndex++;
-        }
-
-        SpaceImageFormatDecoder.Layer layerFewestZeros = image.layers.get(lowest0Layer);
-
-        int oneCount = 0, twoCount = 0;
-
-        for (SpaceImageFormatDecoder.Row row : layerFewestZeros.rows.values()) {
-            for (char c : row.characters) {
-                if (c == '1') {
-                    oneCount++;
-                } else if (c == '2') {
-                    twoCount++;
-                }
-            }
-        }
-
-        return oneCount * twoCount;
+        log.info("Part 2 - Password Image");
+        decoder.renderImage(image, numberOfLayers, height, width);
     }
 }

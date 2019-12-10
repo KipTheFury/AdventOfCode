@@ -1,74 +1,95 @@
 package aoc2019.day8;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class SpaceImageFormatDecoder {
 
     private static final Logger log = LoggerFactory.getLogger(SpaceImageFormatDecoder.class);
 
-    public Image decodeImage(String input, int height, int width) {
+    public int[][][] decodeImage(String input, int layers, int img_height, int img_width) {
 
-        int inputLength = input.length();
-        int layerCount = inputLength / (height * width);
+        int img_size = img_width * img_height;
 
-        if (inputLength % layerCount != 0) {
-            log.error("Input length does not fid the dimensions");
-        }
+        //Image array = layer, height, width
+        int[][][] image = new int[layers][img_height][img_width];
 
-        Image image = new Image();
-
-        char[] chars = input.toCharArray();
-
-        int startIndex = 0;
-        for (int i = 0; i < layerCount; i++) {
-
-            Layer layer = new Layer();
-            char[] subarray = ArrayUtils.subarray(chars, startIndex, startIndex + (width * height));
-
-            Row rowOne = new Row();
-
-            // Populate top row
-            for (int j = 0; j < width; j++) {
-                rowOne.characters.add(subarray[j]);
-            }
-            layer.rows.put(0, rowOne);
-
-            int rowIndex = 1;
-
-            for (int k = width; k < (width * height); k++) {
-                Row row = layer.rows.getOrDefault(rowIndex, new Row());
-                row.characters.add(subarray[k]);
-                layer.rows.put(rowIndex, row);
-
-                rowIndex++;
-                if (rowIndex > height - 1) {
-                    rowIndex = 1;
+        //Parse image to array
+        for (int layer = 0; layer < layers; layer++) {
+            for (int height = 0; height < img_height; height++) {
+                for (int width = 0; width < img_width; width++) {
+                    int pointer = (layer * img_size) + (height * img_width) + width;
+                    image[layer][height][width] = Character.getNumericValue(input.charAt(pointer));
                 }
             }
-
-            image.layers.put(i, layer);
-            startIndex += width * height;
         }
+
         return image;
     }
 
-    public class Image {
-        Map<Integer, Layer> layers = new HashMap<>();
+    public int getImageChecksum(int[][][] image, int layers, int img_height, int img_width) {
+        int minNumberOfZeroes = 99999;
+        int layerWithFewestZeroes = -1;
+
+        for (int layer = 0; layer < layers; layer++) {
+            int zeroes = 0;
+            for (int height = 0; height < img_height; height++) {
+                for (int width = 0; width < img_width; width++) {
+                    if (image[layer][height][width] == 0) {
+                        zeroes++;
+                    }
+                }
+            }
+
+            if (zeroes < minNumberOfZeroes) {
+                layerWithFewestZeroes = layer;
+                minNumberOfZeroes = zeroes;
+            }
+        }
+
+        int numberOfOnes = 0;
+        int numberOfTwos = 0;
+
+        for (int height = 0; height < img_height; height++) {
+            for (int width = 0; width < img_width; width++) {
+                if (image[layerWithFewestZeroes][height][width] == 1) {
+                    numberOfOnes++;
+                }
+                if (image[layerWithFewestZeroes][height][width] == 2) {
+                    numberOfTwos++;
+                }
+            }
+        }
+
+        return numberOfOnes * numberOfTwos;
     }
 
-    public class Layer {
-        Map<Integer, Row> rows = new HashMap<>();
-    }
+    public void renderImage(int[][][] image, int layers, int img_height, int img_width) {
 
-    public class Row {
-        List<Character> characters = new ArrayList<>();
-    }
+        int[][] finalImage = new int[img_height][img_width];
 
+        //Compress layers ignoring 2's
+        for (int width = 0; width < img_width; width++) {
+            for (int height = 0; height < img_height; height++) {
+                for (int layer = 0; layer < layers; layer++) {
+                    if (image[layer][height][width] != 2) {
+                        finalImage[height][width] = image[layer][height][width];
+                        break;
+                    }
+                }
+            }
+        }
+
+        for (int height = 0; height < img_height; height++) {
+            for (int width = 0; width < img_width; width++) {
+                if (finalImage[height][width] == 0) {
+                    System.out.print("  ");
+                }
+                if (finalImage[height][width] == 1) {
+                    System.out.print("X ");
+                }
+            }
+            System.out.print('\n');
+        }
+    }
 }
