@@ -1,11 +1,8 @@
 package aoc2019.day2;
 
 import common.IntcodeParser;
-import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * --- Day 2: 1202 Program Alarm ---
@@ -129,8 +126,8 @@ public class Day2 {
         intcode[1] = 12;
         intcode[2] = 2;
 
-        Pair<int[], List<Integer>> result = parser.parseIntcode(intcode, 0);
-        log.info("Part 1 : Intcode result [{}]", result.getValue0()[0]);
+        IntcodeParser.ReturnValue result = parser.parseIntcode(intcode, null);
+        log.info("Part 1 : Intcode result [{}]", result.getIntcode()[0]);
     }
 
     private static void partTwo() {
@@ -143,12 +140,11 @@ public class Day2 {
                 intcode[1] = noun;
                 intcode[2] = verb;
 
-                Pair<int[], List<Integer>> result = parser.parseIntcode(intcode, 0);
-                if (result.getValue0()[0] == 19690720) {
-
+                IntcodeParser.ReturnValue result = parser.parseIntcode(intcode, null);
+                if (result.getIntcode()[0] == 19690720) {
                     int answer = 100 * noun + verb;
-
                     log.info("Part 2:  noun = [{}] verb = [{}] answer = [{}]", noun, verb, answer);
+                    return;
                 }
             }
         }

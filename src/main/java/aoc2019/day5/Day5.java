@@ -1,11 +1,11 @@
 package aoc2019.day5;
 
 import common.IntcodeParser;
-import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * --- Day 5: Sunny with a Chance of Asteroids ---
@@ -141,12 +141,19 @@ public class Day5 {
 
     public static void main(String[] args) {
 
-        IntcodeParser parser = new IntcodeParser();
-        Pair<int[], List<Integer>> part1Result = parser.parseIntcode(getInitialIntcode(), 1);
-        log.info("Part 1 - Diagnostic Code [{}]", part1Result.getValue1());
+        Queue<Integer> part1Input = new LinkedList<>();
+        part1Input.add(1);
 
-        Pair<int[], List<Integer>> part2Result = parser.parseIntcode(getInitialIntcode(), 5);
-        log.info("Part 2 - Diagnostic Code [{}]", part2Result.getValue1());
+        Queue<Integer> part2Input = new LinkedList<>();
+        part2Input.add(5);
+
+
+        IntcodeParser parser = new IntcodeParser();
+        IntcodeParser.ReturnValue part1Result = parser.parseIntcode(getInitialIntcode(), part1Input);
+        log.info("Part 1 - Diagnostic Code [{}]", part1Result.getOutputs());
+
+        IntcodeParser.ReturnValue part2Result = parser.parseIntcode(getInitialIntcode(), part2Input);
+        log.info("Part 2 - Diagnostic Code [{}]", part2Result.getOutputs());
     }
 
     private static int[] getInitialIntcode() {

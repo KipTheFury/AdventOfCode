@@ -5,9 +5,10 @@ import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class IntcodeParser {
 
@@ -24,59 +25,78 @@ public class IntcodeParser {
     private static final int HALT = 99;
 
     private int pointer;
-    private List<Integer> outputValues;
+    private LinkedList<Integer> outputValues = new LinkedList<>();
 
-    public Pair<int[], List<Integer>> parseIntcode(int[] intcode, int input) {
+    public ReturnValue parseIntcode(int[] intcode, Queue<Integer> input) {
 
         pointer = 0;
-        outputValues = new ArrayList<>();
 
-        while (intcode[pointer] != HALT) {
+        ReturnValue returnValue = new ReturnValue();
 
-            int instruction = intcode[pointer];
-            int[] subInstruction;
+        while (true) {
+            if (intcode[pointer] == HALT) {
 
-            if (instruction > 100) {
-                subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 4);
-                parseParameterModes(intcode, subInstruction, input);
+                returnValue.exitCode = ExitCode.EXIT_99;
+                returnValue.intcode = intcode;
+                returnValue.outputs = outputValues;
+
+                return returnValue;
+
             } else {
 
-                switch (instruction) {
-                    case INPUT:
-                    case OUTPUT:
+                int instruction = intcode[pointer];
+                int[] subInstruction;
 
-                        subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 2);
-                        parse2ParamInstruction(subInstruction, intcode, input);
-                        break;
+                if (instruction > 100) {
+                    subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 4);
+                    parseParameterModes(intcode, subInstruction, input);
+                } else {
 
-                    case JUMP_IF_FALSE:
-                    case JUMP_IF_TRUE:
+                    switch (instruction) {
+                        case INPUT:
+                        case OUTPUT:
 
-                        subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 3);
-                        parse3ParamInstruction(subInstruction, intcode);
-                        break;
+                            subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 2);
+                            ExitCode exit = parse2ParamInstruction(subInstruction, intcode, input);
 
-                    case ADD:
-                    case MULTIPLY:
-                    case LESS_THAN:
-                    case EQUALS:
+                            if (exit != null) {
+                                returnValue.intcode = intcode;
+                                returnValue.exitCode = ExitCode.AWAITING_INPUT;
+                                returnValue.outputs = outputValues;
+                            }
 
-                        subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 4);
-                        subInstruction[1] = intcode[subInstruction[1]];
-                        subInstruction[2] = intcode[subInstruction[2]];
-                        parse4ParamInstruction(subInstruction, intcode);
-                        break;
+                            break;
+
+                        case JUMP_IF_FALSE:
+                        case JUMP_IF_TRUE:
+
+                            subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 3);
+                            parse3ParamInstruction(subInstruction);
+                            break;
+
+                        case ADD:
+                        case MULTIPLY:
+                        case LESS_THAN:
+                        case EQUALS:
+
+                            subInstruction = Arrays.copyOfRange(intcode, pointer, pointer + 4);
+                            subInstruction[1] = intcode[subInstruction[1]];
+                            subInstruction[2] = intcode[subInstruction[2]];
+                            parse4ParamInstruction(subInstruction, intcode);
+                            break;
 
 
-                    default:
-                        log.error("Invalid OpCode [{}] at intcode[{}]", instruction, pointer);
-                        break;
+                        default:
+                            log.error("Invalid OpCode [{}] at intcode[{}]", instruction, pointer);
+                            returnValue.exitCode = ExitCode.UNKNOWN_OPCODE;
+                            returnValue.outputs = outputValues;
+                            returnValue.intcode = intcode;
+
+                            return returnValue;
+                    }
                 }
             }
         }
-
-        Pair<int[], List<Integer>> retVal = Pair.with(intcode, outputValues);
-        return retVal;
     }
 
     private void parse4ParamInstruction(int[] subInstruction, int[] intcode) {
@@ -122,7 +142,7 @@ public class IntcodeParser {
         pointer += 4;
     }
 
-    private void parse3ParamInstruction(int[] subInstruction, int[] intcode) {
+    private void parse3ParamInstruction(int[] subInstruction) {
 
         int opcode = subInstruction[0];
         int param1 = subInstruction[1];
@@ -149,29 +169,39 @@ public class IntcodeParser {
         }
     }
 
-    private void parse2ParamInstruction(int[] subInstruction, int[] intcode, int input) {
+    private ExitCode parse2ParamInstruction(int[] subInstruction, int[] intcode, Queue<Integer> input) {
 
         int opcode = subInstruction[0];
         int param1 = subInstruction[1];
 
+        ExitCode exit = null;
+
         switch (opcode) {
             case INPUT:
 
-                log.debug("Processing Instruction [{}] : Input [{}] to intcode[{}]", subInstruction, input, param1);
-                intcode[param1] = input;
+                if (input.size() == 0) {
+                    exit = ExitCode.AWAITING_INPUT;
+                    pointer -= 2;
+                } else {
+                    log.debug("Processing Instruction [{}] : Input [{}] to intcode[{}]", subInstruction, input, param1);
+                    intcode[param1] = input.poll();
+                    pointer += 2;
+                }
                 break;
 
             case OUTPUT:
 
                 log.debug("Processing Instruction [{}] : Output [{}]", subInstruction, intcode[param1]);
                 outputValues.add(intcode[param1]);
+                pointer += 2;
                 break;
         }
 
-        pointer += 2;
+
+        return exit;
     }
 
-    private void parseParameterModes(int[] intcode, int[] instruction, int input) {
+    private void parseParameterModes(int[] intcode, int[] instruction, Queue<Integer> input) {
 
         int[] parsedInstruction = parseParameterNode(instruction[0]);
         int opcode = parsedInstruction[0] + parsedInstruction[1] * 10;
@@ -190,7 +220,7 @@ public class IntcodeParser {
             Pair<Integer, Integer> params = parseParam2_3(parsedInstruction, intcode, instruction);
 
             int[] subInstruction = new int[]{opcode, params.getValue0(), params.getValue1()};
-            parse3ParamInstruction(subInstruction, intcode);
+            parse3ParamInstruction(subInstruction);
 
         } else if (opcode == INPUT || opcode == OUTPUT) {
 
@@ -231,5 +261,40 @@ public class IntcodeParser {
         int[] parsedInstruction = Integer.toString(i).chars().map(c -> c - '0').toArray();
         ArrayUtils.reverse(parsedInstruction);
         return parsedInstruction;
+    }
+
+    public enum ExitCode {
+        AWAITING_INPUT, EXIT_99, UNKNOWN_OPCODE
+    }
+
+    public static class ReturnValue {
+
+        private int[] intcode;
+        private List<Integer> outputs;
+        private ExitCode exitCode;
+
+        public int[] getIntcode() {
+            return intcode;
+        }
+
+        public void setIntcode(int[] intcode) {
+            this.intcode = intcode;
+        }
+
+        public List<Integer> getOutputs() {
+            return outputs;
+        }
+
+        public void setOutputs(List<Integer> outputs) {
+            this.outputs = outputs;
+        }
+
+        public ExitCode getExitCode() {
+            return exitCode;
+        }
+
+        public void setExitCode(ExitCode exitCode) {
+            this.exitCode = exitCode;
+        }
     }
 }
