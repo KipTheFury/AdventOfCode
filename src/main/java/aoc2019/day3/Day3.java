@@ -1,5 +1,6 @@
 package aoc2019.day3;
 
+import common.Coords;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileUtils;
@@ -89,7 +90,7 @@ public class Day3 {
 
         log.debug("Building Paths");
         long startTime = System.currentTimeMillis();
-        Map<WireIntersector.Coords, Integer> intersections = intersector.calculateIntersections(wires[0].split(","),
+        Map<Coords, Integer> intersections = intersector.calculateIntersections(wires[0].split(","),
                 wires[1].split(","));
         log.debug("Paths built in {} ms", ((System.currentTimeMillis() - startTime)));
 

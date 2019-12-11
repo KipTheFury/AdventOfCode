@@ -1,8 +1,9 @@
 package aoc2019.day3;
 
+import common.Coords;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class WireIntersector {
 
@@ -18,7 +19,7 @@ public class WireIntersector {
 
     private int calculateManhattanDistance(Coords c) {
 
-        return Math.abs(c.x - 0) + Math.abs(c.y - 0);
+        return Math.abs(c.getX() - 0) + Math.abs(c.getY() - 0);
     }
 
     public Map<Coords, Integer> calculateIntersections(String[] wire1, String[] wire2) {
@@ -57,47 +58,5 @@ public class WireIntersector {
         return path;
     }
 
-    static class Coords {
 
-        int x;
-        int y;
-
-        public Coords(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public Coords move(char direction) {
-            switch (direction) {
-                case 'U':
-                    return new Coords(x, y += 1);
-                case 'D':
-                    return new Coords(x, y -= 1);
-                case 'R':
-                    return new Coords(x += 1, y);
-                case 'L':
-                    return new Coords(x -= 1, y);
-                default:
-                    return this;
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "{" + x + "," + y + '}';
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Coords coords = (Coords) o;
-            return x == coords.x && y == coords.y;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(x, y);
-        }
-    }
 }

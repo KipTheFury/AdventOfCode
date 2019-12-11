@@ -1,5 +1,6 @@
 package aoc2019.day3;
 
+import common.Coords;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -17,7 +18,7 @@ class WireIntersectorTest {
     @MethodSource("intersection_inputValues")
     void test_getClosestIntersection(String wire1, String wire2, int expected) {
 
-        Map<WireIntersector.Coords, Integer> intersections = intersector.calculateIntersections(wire1.split(","),
+        Map<Coords, Integer> intersections = intersector.calculateIntersections(wire1.split(","),
                 wire2.split(","));
 
         assertThat(intersector.getClosestIntersection(intersections)).isEqualTo(expected);
@@ -35,7 +36,7 @@ class WireIntersectorTest {
     @MethodSource("steps_inputValues")
     void test_getFewestSteps(String wire1, String wire2, int expected) {
 
-        Map<WireIntersector.Coords, Integer> intersections = intersector.calculateIntersections(wire1.split(","),
+        Map<Coords, Integer> intersections = intersector.calculateIntersections(wire1.split(","),
                 wire2.split(","));
 
         assertThat(intersector.getFewestSteps(intersections)).isEqualTo(expected);
