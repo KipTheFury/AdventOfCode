@@ -35,6 +35,11 @@ public class Coords {
         return y;
     }
 
+    public int calculateManhattanDistance(Coords c) {
+
+        return Math.abs(x - c.getX()) + Math.abs(y - c.getY());
+    }
+
     @Override
     public String toString() {
         return "{" + x + "," + y + '}';

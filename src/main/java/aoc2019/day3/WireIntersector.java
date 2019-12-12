@@ -19,7 +19,7 @@ public class WireIntersector {
 
     private int calculateManhattanDistance(Coords c) {
 
-        return Math.abs(c.getX() - 0) + Math.abs(c.getY() - 0);
+        return Math.abs(c.getX()) + Math.abs(c.getY());
     }
 
     public Map<Coords, Integer> calculateIntersections(String[] wire1, String[] wire2) {
