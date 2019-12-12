@@ -1,8 +1,8 @@
 package aoc2019.day8;
 
+import common.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.FileUtils;
 
 /**
  * --- Day 8: Space ImageLayers Format ---

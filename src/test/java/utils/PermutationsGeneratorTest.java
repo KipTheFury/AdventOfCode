@@ -1,5 +1,6 @@
 package utils;
 
+import common.PermutationsGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

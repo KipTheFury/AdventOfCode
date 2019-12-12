@@ -1,9 +1,9 @@
 package aoc2018.day3;
 
 import common.Coords;
+import common.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.FileUtils;
 
 import java.util.List;
 import java.util.Map;

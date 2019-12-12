@@ -1,8 +1,8 @@
 package aoc2018.day2;
 
+import common.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.FileUtils;
 
 /**
  * --- Day 2: Inventory Management System ---

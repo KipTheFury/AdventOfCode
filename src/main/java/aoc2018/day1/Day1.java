@@ -1,8 +1,8 @@
 package aoc2018.day1;
 
+import common.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.FileUtils;
 
 /**
  * --- Day 1: Chronal Calibration ---

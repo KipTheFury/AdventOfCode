@@ -1,10 +1,10 @@
 package aoc2019.day7;
 
 import common.IntcodeParser;
+import common.PermutationsGenerator;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.PermutationsGenerator;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

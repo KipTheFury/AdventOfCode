@@ -1,6 +1,6 @@
 package aoc2017.day1;
 
-import java.util.ArrayList;
+import common.CircularArrayList;
 
 public class ReverseCaptchaParser {
 
@@ -27,10 +27,5 @@ public class ReverseCaptchaParser {
         return sum;
     }
 
-    public class CircularArrayList<E> extends ArrayList<E> {
-        @Override
-        public E get(int index) {
-            return super.get(index % size());
-        }
-    }
+
 }

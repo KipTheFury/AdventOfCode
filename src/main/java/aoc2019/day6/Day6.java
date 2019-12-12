@@ -1,8 +1,8 @@
 package aoc2019.day6;
 
+import common.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.FileUtils;
 
 /**
  * --- Day 6: Universal Orbit Map ---
