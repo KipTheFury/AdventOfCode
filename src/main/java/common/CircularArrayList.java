@@ -8,4 +8,9 @@ public class CircularArrayList<E> extends ArrayList<E> {
     public E get(int index) {
         return super.get(index % size());
     }
+
+    @Override
+    public E set(int index, E element) {
+        return super.set(index % size(), element);
+    }
 }
