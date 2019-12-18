@@ -7,6 +7,11 @@ public class Coords {
     private final int x;
     private final int y;
 
+    public static final char UP = 'U';
+    public static final char DOWN = 'D';
+    public static final char RIGHT = 'R';
+    public static final char LEFT = 'L';
+
     public Coords(int x, int y) {
         this.x = x;
         this.y = y;
@@ -14,13 +19,13 @@ public class Coords {
 
     public Coords move(char direction) {
         switch (direction) {
-            case 'U':
+            case UP:
                 return new Coords(x, y + 1);
-            case 'D':
+            case DOWN:
                 return new Coords(x, y - 1);
-            case 'R':
+            case RIGHT:
                 return new Coords(x + 1, y);
-            case 'L':
+            case LEFT:
                 return new Coords(x - 1, y);
             default:
                 return this;
