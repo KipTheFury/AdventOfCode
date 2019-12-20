@@ -32,6 +32,21 @@ public class Coords {
         }
     }
 
+    public Coords move(char direction, int distance) {
+        switch (direction) {
+            case UP:
+                return new Coords(x, y + distance);
+            case DOWN:
+                return new Coords(x, y - distance);
+            case RIGHT:
+                return new Coords(x + distance, y);
+            case LEFT:
+                return new Coords(x - distance, y);
+            default:
+                return this;
+        }
+    }
+
     public int getX() {
         return x;
     }
